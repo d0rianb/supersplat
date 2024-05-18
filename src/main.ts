@@ -1,4 +1,5 @@
 import { createGraphicsDevice } from 'playcanvas';
+
 import { Scene } from './scene';
 import { getSceneConfig } from './scene-config';
 import { CreateDropHandler } from './drop-handler';
@@ -15,6 +16,7 @@ import { BrushSelection } from './tools/brush-selection';
 import { Shortcuts } from './shortcuts';
 import { Events } from './events';
 import { PickerSelection } from './tools/picker-selection';
+import { Ruler } from './tools/ruler';
 
 declare global {
     interface Window {
@@ -173,6 +175,7 @@ const main = async () => {
     toolManager.register('rectSelection', new RectSelection(events, editorUI.canvasContainer.dom));
     toolManager.register('brushSelection', new BrushSelection(events, editorUI.canvasContainer.dom));
     toolManager.register('pickerSelection', new PickerSelection(events, editorUI.canvasContainer.dom));
+    toolManager.register('ruler', new Ruler(events, editorUI.canvasContainer.dom));
 
     registerEditorEvents(events, editHistory, scene, editorUI, remoteStorageDetails);
     initDropHandler(editorUI.canvas, scene);

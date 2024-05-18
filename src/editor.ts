@@ -20,6 +20,7 @@ import { convertPly, convertPlyCompressed, convertSplat } from './splat-convert'
 import { startSpinner, stopSpinner } from './ui/spinner';
 import { Events } from './events';
 
+
 // download the data uri
 const download = (filename: string, data: ArrayBuffer) => {
     const blob = new Blob([data], { type: "octet/stream" });
@@ -33,8 +34,8 @@ const download = (filename: string, data: ArrayBuffer) => {
     if (document.createEvent) {
         const e = document.createEvent("MouseEvents");
         e.initMouseEvent("click", true, true, window,
-                         0, 0, 0, 0, 0, false, false, false,
-                         false, 0, null);
+            0, 0, 0, 0, 0, false, false, false,
+            false, 0, null);
         lnk.dispatchEvent(e);
     } else {
         // @ts-ignore
@@ -120,6 +121,7 @@ const registerEditorEvents = (events: Events, editHistory: EditHistory, scene: S
     const debugPlane = new Vec3();
     let debugPlaneDistance = 0;
 
+
     // draw debug mesh instances
     events.on('prerender', () => {
         const app = scene.app;
@@ -142,11 +144,11 @@ const registerEditorEvents = (events: Events, editHistory: EditHistory, scene: S
                 mat.setLookAt(vec, vec2, Math.abs(Vec3.UP.dot(debugPlane)) > 0.99 ? Vec3.FORWARD : Vec3.UP);
 
                 const lines = [
-                    new Vec3(-1,-1, 0), new Vec3( 1,-1, 0),
-                    new Vec3( 1,-1, 0), new Vec3( 1, 1, 0),
-                    new Vec3( 1, 1, 0), new Vec3(-1, 1, 0),
-                    new Vec3(-1, 1, 0), new Vec3(-1,-1, 0),
-                    new Vec3( 0, 0, 0), new Vec3( 0, 0,-1)
+                    new Vec3(-1, -1, 0), new Vec3(1, -1, 0),
+                    new Vec3(1, -1, 0), new Vec3(1, 1, 0),
+                    new Vec3(1, 1, 0), new Vec3(-1, 1, 0),
+                    new Vec3(-1, 1, 0), new Vec3(-1, -1, 0),
+                    new Vec3(0, 0, 0), new Vec3(0, 0, -1)
                 ];
                 for (let i = 0; i < lines.length; ++i) {
                     mat.transformPoint(lines[i], lines[i]);
@@ -691,6 +693,10 @@ const registerEditorEvents = (events: Events, editHistory: EditHistory, scene: S
     events.on('scene.exportPly', () => exportScene('ply'));
     events.on('scene.exportCompressedPly', () => exportScene('ply-compressed'));
     events.on('scene.exportSplat', () => exportScene('splat'));
+
+    events.on('ruler-start', ({ x: clickX, y: clickY }) => {
+        console.log(clickX, clickY)
+    })
 }
 
 export { registerEditorEvents };

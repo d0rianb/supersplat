@@ -3,7 +3,7 @@ import { Events } from '../events';
 import { version as supersplatVersion } from '../../package.json';
 
 class ControlPanel extends Panel {
-    constructor(events: Events, remoteStorageMode: boolean, args = { }) {
+    constructor(events: Events, remoteStorageMode: boolean, args = {}) {
         Object.assign(args, {
             headerText: `SUPER SPLAT v${supersplatVersion}`,
             id: 'control-panel',
@@ -127,7 +127,7 @@ class ControlPanel extends Panel {
         selectGlobal.append(selectAllButton);
         selectGlobal.append(selectNoneButton);
         selectGlobal.append(invertSelectionButton);
-        
+
         // select by size
         const selectBySize = new Container({
             class: 'control-parent'
@@ -290,9 +290,16 @@ class ControlPanel extends Panel {
             enabled: true
         });
 
+        const rulerButton = new Button({
+            class: 'control-element-expand',
+            text: 'Ruler',
+            enabled: true
+        });
+
         selectTools.append(rectSelectButton);
         selectTools.append(brushSelectButton);
         selectTools.append(pickerSelectButton);
+        selectTools.append(rulerButton);
 
         selectionPanel.append(selectGlobal);
         selectionPanel.append(selectBySize);
@@ -454,10 +461,15 @@ class ControlPanel extends Panel {
             events.fire('tool.pickerSelection');
         });
 
+        rulerButton.on('click', () => {
+            events.fire('tool.ruler');
+        })
+
         events.on('tool.activated', (toolName: string) => {
             rectSelectButton.class[toolName === 'rectSelection' ? 'add' : 'remove']('active');
             brushSelectButton.class[toolName === 'brushSelection' ? 'add' : 'remove']('active');
             pickerSelectButton.class[toolName === 'pickerSelection' ? 'add' : 'remove']('active');
+            rulerButton.class[toolName === 'ruler' ? 'add' : 'remove']('active');
         });
 
         // radio logic
