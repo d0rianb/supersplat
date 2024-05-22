@@ -6,8 +6,11 @@ import {
     GSplatInstance,
     Mat4,
     path,
+    Vec2,
     Vec3,
     Vec4,
+    Entity,
+    ELEMENTTYPE_TEXT
 } from 'playcanvas';
 import { Scene } from './scene';
 import { EditorUI } from './ui/editor';
@@ -77,6 +80,9 @@ const registerEditorEvents = (events: Events, editHistory: EditHistory, scene: S
     const mat = new Mat4();
     const aabb = new BoundingBox();
     const splatDefs: SplatDef[] = [];
+    // ruler
+    let point1: Vec3 | null = null
+    let point2: Vec3 | null = null
 
     events.on('error', (err: any) => {
         editorUI.showError(err);
@@ -157,6 +163,20 @@ const registerEditorEvents = (events: Events, editHistory: EditHistory, scene: S
                 app.drawLines(lines, Color.RED);
             }
         });
+
+        const rulerPointSize = 0.02
+        const rulerColor = Color.WHITE
+
+        if (point1) {
+            app.drawWireSphere(point1, rulerPointSize, rulerColor, 40)
+        }
+        if (point2) {
+            app.drawWireSphere(point2, rulerPointSize, rulerColor, 40)
+        }
+        if (point1 && point2) {
+            app.drawLine(point1, point2, rulerColor)
+        }
+
     });
 
     // update the splat state data
@@ -694,8 +714,65 @@ const registerEditorEvents = (events: Events, editHistory: EditHistory, scene: S
     events.on('scene.exportCompressedPly', () => exportScene('ply-compressed'));
     events.on('scene.exportSplat', () => exportScene('splat'));
 
-    events.on('ruler-start', ({ x: clickX, y: clickY }) => {
-        console.log(clickX, clickY)
+    // Ruler callbacks
+
+    const selectPoint: Vec3 | null = (clickX: number, clickY: number) => {
+        const { width, height } = scene.targetSize;
+
+        let minDistSq = Infinity
+        let minPoint = vec.clone();
+
+        splatDefs.forEach(splatDef => {
+            const splatData = splatDef.data;
+            const state = splatDef.data.getProp('state') as Uint8Array;
+
+            const x = splatData.getProp('x');
+            const y = splatData.getProp('y');
+            const z = splatData.getProp('z');
+
+            const camera = scene.camera.entity.camera;
+            const sx = clickX * width;
+            const sy = clickY * height;
+
+            // calculate final matrix
+            mat.mul2(camera.camera._viewProjMat, splatDef.element.worldTransform);
+
+            for (let i = 0; i < state.length; i++) {
+                vec4.set(x[i], y[i], z[i], 1.0);
+                mat.transformVec4(vec4, vec4);
+                const px = (vec4.x / vec4.w * 0.5 + 0.5) * width;
+                const py = (-vec4.y / vec4.w * 0.5 + 0.5) * height;
+                const depth = vec4.z / vec4.w;
+                const distSq = Math.abs(px - sx) ** 2 + Math.abs(py - sy) ** 2 + depth
+                if (distSq < minDistSq) {
+                    minDistSq = distSq
+                    minPoint.set(x[i], y[i], z[i])
+                }
+            };
+        });
+        return minPoint
+    }
+
+    events.on('ruler-click', ({ x: clickX, y: clickY }) => {
+        const SCALE_COEFF = 5.0
+        const point = selectPoint(clickX, clickY)
+        if (point1 == null) {
+            // Start a measure
+            point1 = point;
+        } else if (point2 == null) {
+            // End a measure
+            point2 = point
+
+            let dist = point2.distance(point1)
+
+            console.log(`${dist.toFixed(2) * SCALE_COEFF}m`)
+
+        } else {
+            // Reset the measure and start a new one
+            point1 = point
+            point2 = null
+        }
+        scene.forceRender = true;
     })
 }
 

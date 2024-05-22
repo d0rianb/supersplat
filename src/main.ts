@@ -102,11 +102,9 @@ const initShortcuts = (events: Events) => {
     shortcuts.register(['M', 'm'], { event: 'camera.toggleMode' });
 
     // keep tabs on splat size changes
-    let splatSizeSave = 2;
+    let splatSizeSave = 0;
     events.on('splatSize', (size: number) => {
-        if (size !== 0) {
-            splatSizeSave = size;
-        }
+        splatSizeSave = size;
     });
 
     // space toggles between 0 and size
