@@ -35,7 +35,7 @@ class ControlPanel extends Panel {
 
         const modeSelect = new SelectInput({
             class: 'control-element-expand',
-            defaultValue: 'centers',
+            defaultValue: 'rings',
             options: [
                 { v: 'centers', t: 'Centers' },
                 { v: 'rings', t: 'Rings' }
@@ -60,7 +60,7 @@ class ControlPanel extends Panel {
             precision: 1,
             min: 0,
             max: 10,
-            value: 2
+            value: 0
         });
 
         splatSize.append(splatSizeLabel);
@@ -99,6 +99,12 @@ class ControlPanel extends Panel {
             id: 'selection-panel',
             class: 'control-panel',
             headerText: 'SELECTION'
+        });
+
+        const toolsPanel = new Panel({
+            id: 'tools-panel',
+            class: 'control-panel',
+            headerText: 'TOOLS'
         });
 
         // selection button parent
@@ -296,10 +302,11 @@ class ControlPanel extends Panel {
             enabled: true
         });
 
+        toolsPanel.append(rulerButton);
+
         selectTools.append(rectSelectButton);
         selectTools.append(brushSelectButton);
         selectTools.append(pickerSelectButton);
-        selectTools.append(rulerButton);
 
         selectionPanel.append(selectGlobal);
         selectionPanel.append(selectBySize);
@@ -443,6 +450,7 @@ class ControlPanel extends Panel {
 
         // append
         this.content.append(cameraPanel);
+        this.content.append(toolsPanel);
         this.content.append(selectionPanel);
         this.content.append(showPanel);
         this.content.append(modifyPanel);

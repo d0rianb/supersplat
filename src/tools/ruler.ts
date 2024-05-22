@@ -6,9 +6,6 @@ class Ruler {
     events: Events;
     root: HTMLElement;
 
-    point1: Vec3 | null = null;
-    point2: Vec3 | null = null;
-
     constructor(events: Events, parent: HTMLElement) {
         this.root = document.createElement('div');
         this.root.id = 'select-root';
@@ -18,17 +15,10 @@ class Ruler {
             e.stopPropagation();
 
             if (e.button === 0) {
-                if (this.point1 == null) {
-                    events.fire(
-                        'ruler-start',
-                        { x: e.offsetX / this.root.clientWidth, y: e.offsetY / this.root.clientHeight }
-                    );
-                } else if (this.point2 == null) {
-                    events.fire(
-                        'ruler-end',
-                        { x: e.offsetX / this.root.clientWidth, y: e.offsetY / this.root.clientHeight }
-                    );
-                }
+                events.fire(
+                    'ruler-click',
+                    { x: e.offsetX / this.root.clientWidth, y: e.offsetY / this.root.clientHeight }
+                );
             }
         };
 
